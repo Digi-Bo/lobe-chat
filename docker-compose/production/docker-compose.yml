@@ -5,11 +5,12 @@ services:
     image: pgvector/pgvector:pg16
     container_name: lobe-postgres
     ports:
-      - '5433:5433'
+      - '${PORTS}:${PORTS}'  # Utilisation de la variable d'environnement PORTS
     volumes:
       - './data:/var/lib/postgresql/data'
     environment:
-      - 'POSTGRES_DB=lobe'
+      - 'POSTGRES_DB=${POSTGRES_DB}'  # Utilisation de la variable d'environnement POSTGRES_DB
+      - 'POSTGRES_PASSWORD=${POSTGRES_PASSWORD}'  # Utilisation de la variable d'environnement POSTGRES_PASSWORD
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -26,8 +27,8 @@ services:
     volumes:
       - /srv/minio/data:/etc/minio/data  # Volume pour persister les données
     environment:
-      - MINIO_ROOT_USER=YOUR_MINIO_USER  # Remplacez par votre nom d'utilisateur MinIO
-      - MINIO_ROOT_PASSWORD=YOUR_MINIO_PASSWORD  # Remplacez par votre mot de passe MinIO
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}  # Utilisation de la variable d'environnement pour l'utilisateur MinIO
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}  # Utilisation de la variable d'environnement pour le mot de passe MinIO
       - MINIO_DOMAIN=lobe-s3-api.example.com
       - MINIO_API_CORS_ALLOW_ORIGIN=https://lobechat.digitalbonobo.com  # Domaine LobeChat
     restart: always
@@ -43,12 +44,19 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
+
+
+        
     environment:
       - 'TRUST_PROXY_HEADER=1'
-      - 'DB_URL=${DATABASE_URL}  # Connexion à PostgreSQL
-      - 'ENDPOINT=https://lobe-auth-api.example.com'
-      - 'ADMIN_ENDPOINT=https://lobe-auth-ui.example.com'
+      - 'DB_URL=${POSTGRESQL_CONNECTION_URL}'  # Connexion à PostgreSQL via variable d'environnement
+      - 'ENDPOINT=${LOBECHAT_AUTH_API_URL}'  # URL de l'API d'authentification de LobeChat
+      - 'ADMIN_ENDPOINT=${LOBECHAT_AUTH_ADMIN_URL}'  # URL de l'interface d'administration de LobeChat
     entrypoint: ['sh', '-c', 'npm run cli db seed -- --swe && npm start']
+
+
+
+
 
   lobe:
     image: lobehub/lobe-chat-database
