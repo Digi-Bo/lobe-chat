@@ -10,7 +10,6 @@ services:
       - './data:/var/lib/postgresql/data'
     environment:
       - 'POSTGRES_DB=lobe'
-      - 'POSTGRES_PASSWORD=uWNZugjBqixf8dxC'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -46,7 +45,7 @@ services:
         condition: service_healthy
     environment:
       - 'TRUST_PROXY_HEADER=1'
-      - 'DB_URL=postgresql://postgres:uWNZugjBqixf8dxC@lobe-postgres:5433/logto'  # Connexion à PostgreSQL
+      - 'DB_URL=${DATABASE_URL}  # Connexion à PostgreSQL
       - 'ENDPOINT=https://lobe-auth-api.example.com'
       - 'ADMIN_ENDPOINT=https://lobe-auth-ui.example.com'
     entrypoint: ['sh', '-c', 'npm run cli db seed -- --swe && npm start']
