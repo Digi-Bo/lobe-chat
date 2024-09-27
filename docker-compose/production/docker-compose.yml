@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgresql:
     image: pgvector/pgvector:pg16
@@ -23,21 +25,15 @@ services:
       - '9000:9000'  # API MinIO
       - '9001:9001'  # Console MinIO
     volumes:
-      - /srv/minio/data:/etc/minio/data  # Ajouter le volume ici pour persister les données
+      - /srv/minio/data:/etc/minio/data  # Volume pour persister les données
     environment:
       - MINIO_ROOT_USER=YOUR_MINIO_USER  # Remplacez par votre nom d'utilisateur MinIO
       - MINIO_ROOT_PASSWORD=YOUR_MINIO_PASSWORD  # Remplacez par votre mot de passe MinIO
       - MINIO_DOMAIN=lobe-s3-api.example.com
-      - MINIO_API_CORS_ALLOW_ORIGIN=https://lobechat.digitalbonobo.com  # Votre domaine LobeChat
+      - MINIO_API_CORS_ALLOW_ORIGIN=https://lobechat.digitalbonobo.com  # Domaine LobeChat
     restart: always
     command: >
       server /etc/minio/data --address ":9000" --console-address ":9001"
-
-volumes:
-  minio_data:
-    driver: local
-
-
 
   logto:
     image: svhd/logto
@@ -50,7 +46,7 @@ volumes:
         condition: service_healthy
     environment:
       - 'TRUST_PROXY_HEADER=1'
-      - 'DB_URL=postgresql://postgres:uWNZugjBqixf8dxC@postgresql:5432/logto'
+      - 'DB_URL=postgresql://postgres:uWNZugjBqixf8dxC@lobe-postgres:5433/logto'  # Connexion à PostgreSQL
       - 'ENDPOINT=https://lobe-auth-api.example.com'
       - 'ADMIN_ENDPOINT=https://lobe-auth-ui.example.com'
     entrypoint: ['sh', '-c', 'npm run cli db seed -- --swe && npm start']
@@ -65,11 +61,13 @@ volumes:
       - minio
       - logto
     env_file:
-      - .env
+      - .env  # Fichier contenant les variables d'environnement
     restart: always
 
 volumes:
   data:
+    driver: local
+  minio_data:
     driver: local
   s3_data:
     driver: local
