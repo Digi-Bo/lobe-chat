@@ -5,12 +5,12 @@ services:
     image: pgvector/pgvector:pg16
     container_name: lobe-postgres
     ports:
-      - '${PORTS}:${PORTS}'  # Utilisation de la variable d'environnement PORTS
+      - '5433:5433'
     volumes:
       - './data:/var/lib/postgresql/data'
     environment:
-      - 'POSTGRES_DB=${POSTGRES_DB}'  # Utilisation de la variable d'environnement POSTGRES_DB
-      - 'POSTGRES_PASSWORD=${POSTGRES_PASSWORD}'  # Utilisation de la variable d'environnement POSTGRES_PASSWORD
+      - POSTGRES_DB=${POSTGRES_DB}  # Utilisation des variables d'environnement depuis Coolify
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}  # Utilisation du mot de passe PostgreSQL défini dans Coolify
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -27,36 +27,13 @@ services:
     volumes:
       - /srv/minio/data:/etc/minio/data  # Volume pour persister les données
     environment:
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}  # Utilisation de la variable d'environnement pour l'utilisateur MinIO
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}  # Utilisation de la variable d'environnement pour le mot de passe MinIO
-      - MINIO_DOMAIN=lobe-s3-api.example.com
-      - MINIO_API_CORS_ALLOW_ORIGIN=https://lobechat.digitalbonobo.com  # Domaine LobeChat
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}  # Utilisation des variables d'environnement depuis Coolify
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DOMAIN=${MINIO_DOMAIN}
+      - MINIO_API_CORS_ALLOW_ORIGIN=${MINIO_API_CORS_ALLOW_ORIGIN}
     restart: always
     command: >
       server /etc/minio/data --address ":9000" --console-address ":9001"
-
-  logto:
-    image: svhd/logto
-    container_name: lobe-logto
-    ports:
-      - '3001:3001'
-      - '3002:3002'
-    depends_on:
-      postgresql:
-        condition: service_healthy
-
-
-        
-    environment:
-      - 'TRUST_PROXY_HEADER=1'
-      - 'DB_URL=${POSTGRESQL_CONNECTION_URL}'  # Connexion à PostgreSQL via variable d'environnement
-      - 'ENDPOINT=${LOBECHAT_AUTH_API_URL}'  # URL de l'API d'authentification de LobeChat
-      - 'ADMIN_ENDPOINT=${LOBECHAT_AUTH_ADMIN_URL}'  # URL de l'interface d'administration de LobeChat
-    entrypoint: ['sh', '-c', 'npm run cli db seed -- --swe && npm start']
-
-
-
-
 
   lobe:
     image: lobehub/lobe-chat-database
@@ -66,9 +43,9 @@ services:
     depends_on:
       - postgresql
       - minio
-      - logto
-    env_file:
-      - .env  # Fichier contenant les variables d'environnement
+    environment:
+      - DB_URL=${DATABASE_URL}  # Connexion à PostgreSQL via la variable d'environnement dans Coolify
+      - MINIO_URL=${MINIOS3_API_URL}  # Utilisation de l'URL API MinIO depuis Coolify
     restart: always
 
 volumes:
