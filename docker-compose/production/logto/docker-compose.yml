@@ -18,8 +18,11 @@ services:
       - 'MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}'
       - 'MINIO_SECRET_KEY=${MINIO_SECRET_KEY}'
       
-      # Authentification via LogTo
+      # Connexion à LogTo
       - 'AUTH_ENDPOINT=${AUTH_ENDPOINT}'  # URL de l'API LogTo
+      - 'AUTH_CLIENT_ID=${AUTH_CLIENT_ID}'  # Client ID pour l'authentification OAuth
+      - 'AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}'  # Secret client pour OAuth
+
       
       # Configuration JWT
       - 'JWT_EXPIRY=3600'  # Expiration des tokens
