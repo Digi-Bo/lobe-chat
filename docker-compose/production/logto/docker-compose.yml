@@ -1,34 +1,40 @@
-name: lobe-chat-database
+version: '3.8'
+
 services:
-  lobe:
+  lobechat:
     image: lobehub/lobe-chat-database
     container_name: lobe-chat
     ports:
       - '3210:3210'
     environment:
-      # Connexion à PostgreSQL dans Supabase
-      - 'DATABASE_URL=${DATABASE_URL}'
-      
-      # API Supabase (Frontend/REST)
-      - 'NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}'
-      - 'NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}'
-      
-      # Connexion à MinIO
-      - 'MINIO_ENDPOINT=${MINIO_ENDPOINT}'
-      - 'MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}'
-      - 'MINIO_SECRET_KEY=${MINIO_SECRET_KEY}'
-      
-      # Connexion à LogTo
-      - 'AUTH_ENDPOINT=${AUTH_ENDPOINT}'  # URL de l'API LogTo
-      - 'AUTH_CLIENT_ID=${AUTH_CLIENT_ID}'  # Client ID pour l'authentification OAuth
-      - 'AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}'  # Secret client pour OAuth
+      # LobeChat URL
+      - 'APP_URL=${APP_URL}'  # Domaine de LobeChat (ex. https://lobe.example.com)
 
-      
-      # Configuration JWT
-      - 'JWT_EXPIRY=3600'  # Expiration des tokens
-      
-      # Autres configurations si nécessaires
-      - 'DEBUG=true'  # Activer le mode débogage si besoin
+      # PostgreSQL (Supabase)
+      - 'DATABASE_URL=${DATABASE_URL}'  # URL de connexion PostgreSQL
+
+      # Secret pour cryptage
+      - 'KEY_VAULTS_SECRET=${KEY_VAULTS_SECRET}'
+
+      # Authentification avec NextAuth et LogTo
+      - 'NEXT_AUTH_SECRET=${NEXT_AUTH_SECRET}'  # Secret NextAuth
+      - 'NEXT_AUTH_SSO_PROVIDERS=${NEXT_AUTH_SSO_PROVIDERS}'  # Fournisseur d'authentification
+      - 'NEXTAUTH_URL=${NEXTAUTH_URL}'  # URL de callback NextAuth
+      - 'AUTH_LOGTO_ID=${AUTH_LOGTO_ID}'  # ID de l'application LogTo
+      - 'AUTH_LOGTO_SECRET=${AUTH_LOGTO_SECRET}'  # Secret de l'application LogTo
+      - 'AUTH_LOGTO_ISSUER=${AUTH_LOGTO_ISSUER}'  # URL de l'API LogTo (OIDC)
+
+      # MinIO (S3) configuration
+      - 'S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}'
+      - 'S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}'
+      - 'S3_ENDPOINT=${S3_ENDPOINT}'  # Endpoint pour MinIO
+      - 'S3_BUCKET=${S3_BUCKET}'  # Nom du bucket
+      - 'S3_PUBLIC_DOMAIN=${S3_PUBLIC_DOMAIN}'  # Domaine public
+      - 'S3_ENABLE_PATH_STYLE=${S3_ENABLE_PATH_STYLE}'  # Activer le style des chemins pour MinIO
+
+      # OpenAI (si utilisé pour les modèles d'embedding)
+      - 'OPENAI_API_KEY=${OPENAI_API_KEY}'  # Clé API OpenAI
+      - 'OPENAI_PROXY_URL=${OPENAI_PROXY_URL}'  # URL du proxy OpenAI
+      - 'OPENAI_MODEL_LIST=${OPENAI_MODEL_LIST}'  # Liste des modèles OpenAI (optionnel)
+
     restart: always
-
-volumes: {}
