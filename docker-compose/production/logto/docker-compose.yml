@@ -16,10 +16,7 @@ services:
       # Secret pour cryptage
       - 'KEY_VAULTS_SECRET=${KEY_VAULTS_SECRET}'
 
-      # Authentification avec NextAuth et LogTo
-      - 'NEXT_AUTH_SECRET=${NEXT_AUTH_SECRET}'  # Secret NextAuth
-      - 'NEXT_AUTH_SSO_PROVIDERS=${NEXT_AUTH_SSO_PROVIDERS}'  # Fournisseur d'authentification
-      - 'NEXTAUTH_URL=${NEXTAUTH_URL}'  # URL de callback NextAuth
+      # Authentification avec LogTo
       - 'AUTH_LOGTO_ID=${AUTH_LOGTO_ID}'  # ID de l'application LogTo
       - 'AUTH_LOGTO_SECRET=${AUTH_LOGTO_SECRET}'  # Secret de l'application LogTo
       - 'AUTH_LOGTO_ISSUER=${AUTH_LOGTO_ISSUER}'  # URL de l'API LogTo (OIDC)
