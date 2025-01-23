@@ -2,36 +2,41 @@ version: '3.8'
 
 services:
   lobechat:
-    image: lobehub/lobe-chat-database
+    image: lobehub/lobe-chat-database:latest
     container_name: lobe-chat
     ports:
-      - '3210:3210'
+      - '3210:3210' # Port d'exposition de LobeChat
     environment:
       # LobeChat URL
-      - 'APP_URL=${APP_URL}'  # Domaine de LobeChat (ex. https://lobe.example.com)
+      - APP_URL=${APP_URL} # Domaine de LobeChat (ex. https://lobe.example.com)
 
-      # PostgreSQL (Supabase)
-      - 'DATABASE_URL=${DATABASE_URL}'  # URL de connexion PostgreSQL
+      # PostgreSQL (via Supabase ou autre)
+      - DATABASE_URL=${DATABASE_URL} # URL de connexion PostgreSQL, fourni par Supabase
 
       # Secret pour cryptage
-      - 'KEY_VAULTS_SECRET=${KEY_VAULTS_SECRET}'
+      - KEY_VAULTS_SECRET=${KEY_VAULTS_SECRET}
 
       # Authentification avec LogTo
-      - 'AUTH_LOGTO_ID=${AUTH_LOGTO_ID}'  # ID de l'application LogTo
-      - 'AUTH_LOGTO_SECRET=${AUTH_LOGTO_SECRET}'  # Secret de l'application LogTo
-      - 'AUTH_LOGTO_ISSUER=${AUTH_LOGTO_ISSUER}'  # URL de l'API LogTo (OIDC)
+      - AUTH_LOGTO_ID=${AUTH_LOGTO_ID} # ID de l'application LogTo
+      - AUTH_LOGTO_SECRET=${AUTH_LOGTO_SECRET} # Secret de l'application LogTo
+      - AUTH_LOGTO_ISSUER=${AUTH_LOGTO_ISSUER} # URL de l'API LogTo (OIDC)
 
-      # MinIO (S3) configuration
-      - 'S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}'
-      - 'S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}'
-      - 'S3_ENDPOINT=${S3_ENDPOINT}'  # Endpoint pour MinIO
-      - 'S3_BUCKET=${S3_BUCKET}'  # Nom du bucket
-      - 'S3_PUBLIC_DOMAIN=${S3_PUBLIC_DOMAIN}'  # Domaine public
-      - 'S3_ENABLE_PATH_STYLE=${S3_ENABLE_PATH_STYLE}'  # Activer le style des chemins pour MinIO
+      # S3 configuration (MinIO fourni par Coolify)
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID} # Clé d'accès pour MinIO
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY} # Clé secrète pour MinIO
+      - S3_ENDPOINT=${S3_ENDPOINT} # Endpoint S3 (URL de MinIO)
+      - S3_BUCKET=${S3_BUCKET} # Nom du bucket S3
+      - S3_PUBLIC_DOMAIN=${S3_PUBLIC_DOMAIN} # Domaine public S3
+      - S3_ENABLE_PATH_STYLE=${S3_ENABLE_PATH_STYLE} # Activer le style des chemins pour MinIO (1 pour MinIO)
 
-      # OpenAI (si utilisé pour les modèles d'embedding)
-      - 'OPENAI_API_KEY=${OPENAI_API_KEY}'  # Clé API OpenAI
-      - 'OPENAI_PROXY_URL=${OPENAI_PROXY_URL}'  # URL du proxy OpenAI
-      - 'OPENAI_MODEL_LIST=${OPENAI_MODEL_LIST}'  # Liste des modèles OpenAI (optionnel)
+      # OpenAI (optionnel pour les modèles d'embedding)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_PROXY_URL=${OPENAI_PROXY_URL}
+      - OPENAI_MODEL_LIST=${OPENAI_MODEL_LIST}
+
+      # NextAuth
+      - NEXT_AUTH_SECRET=${NEXT_AUTH_SECRET} # Clé secrète pour NextAuth
+      - NEXT_AUTH_SSO_PROVIDERS=${NEXT_AUTH_SSO_PROVIDERS} # Exemple : logto
+      - NEXTAUTH_URL=${NEXTAUTH_URL} # URL de callback pour NextAuth
 
     restart: always
